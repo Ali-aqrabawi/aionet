@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+venv/
+dist/
+*.egg-info/
+poetry.lock
+
+# Unit tests
+tests/*.log
+*.yaml
+
+# Docs
+/docs/_build
+/docs/[Mm]ake*
+
+# Others
+.idea/
+.vscode/
+
+main.py

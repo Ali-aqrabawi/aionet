@@ -208,16 +208,16 @@ class BaseDevice(object):
         * _set_base_prompt() for finding and setting device prompt
         * _disable_paging() for non interactive output in commands
         """
-        self._logger.info("Host {}: Trying to connect to the device".format(self.host))
+        self._logger.info("Host %s: Trying to connect to the device" % (self.host))
         await self._establish_connection()
         await self._session_preparation()
 
-        logger.info("Host {}: Has connected to the device".format(self.host))
+        logger.info("Host %s: Has connected to the device" % (self.host))
 
     async def _establish_connection(self):
         """Establishing SSH connection to the network device"""
         self._logger.info(
-            "Host {}: Establishing connection ".format(self.host)
+            "Host %s: Establishing connection " % (self.host)
         )
 
         # initiate SSH connection
@@ -230,7 +230,7 @@ class BaseDevice(object):
 
         await conn.connect()
         self._conn = conn
-        self._logger.info("Host {}: Connection is established".format(self.host))
+        self._logger.info("Host %s: Connection is established" % (self.host))
 
     async def _session_preparation(self):
         """ Prepare session before start using it """
@@ -239,7 +239,7 @@ class BaseDevice(object):
 
     async def _flush_buffer(self):
         """ flush unnecessary data """
-        self._logger.debug("Host {}: Flushing buffers".format(self.host))
+        self._logger.debug("Host %s: Flushing buffers" % (self.host))
 
         delimiters = map(re.escape, type(self)._delimiter_list)
         delimiters = r"|".join(delimiters)
@@ -249,7 +249,7 @@ class BaseDevice(object):
     async def _disable_paging(self):
         """ disable terminal pagination """
         self._logger.info(
-            "Host {}: Disabling Pagination, command = %r".format(self.host, type(self)._disable_paging_command))
+            "Host %s: Disabling Pagination, command = %r" % (self.host, type(self)._disable_paging_command))
         await self._send_command_expect(type(self)._disable_paging_command)
 
     async def _set_base_prompt(self):
@@ -261,7 +261,7 @@ class BaseDevice(object):
 
         For Cisco devices base_pattern is "prompt(\(.*?\))?[#|>]
         """
-        self._logger.info("Host {}: Setting base prompt".format(self.host))
+        self._logger.info("Host %s: Setting base prompt" % (self.host))
         prompt = await self._find_prompt()
 
         # Strip off trailing terminator
@@ -275,15 +275,15 @@ class BaseDevice(object):
         base_prompt = re.escape(base_prompt[:12])
         pattern = type(self)._pattern
         base_pattern = pattern.format(prompt=base_prompt, delimiters=delimiters)
-        self._logger.debug("Host {}: Base Prompt: {}".format(self.host, base_prompt))
-        self._logger.debug("Host {}: Base Pattern: {}".format(self.host, base_pattern))
+        self._logger.debug("Host %s: Base Prompt: %s" % (self.host, base_prompt))
+        self._logger.debug("Host %s: Base Pattern: %s" % (self.host, base_pattern))
         if not base_pattern:
             raise ValueError("unable to find base_pattern")
         self._conn.set_base_pattern(base_pattern)
 
     async def _find_prompt(self):
         """Finds the current network device prompt, last line only"""
-        self._logger.info("Host {}: Finding prompt".format(self.host))
+        self._logger.info("Host %s: Finding prompt" % (self.host))
         await self.send_new_line(dont_read=True)
         delimiters = map(re.escape, type(self)._delimiter_list)
         delimiters = r"|".join(delimiters)
@@ -293,9 +293,9 @@ class BaseDevice(object):
             prompt = self._strip_ansi_escape_codes(prompt)
         if not prompt:
             raise ValueError(
-                "Host {}: Unable to find prompt: {}".format(self.host, repr(prompt))
+                "Host %s: Unable to find prompt: %s"%(self.host, repr(prompt))
             )
-        self._logger.debug("Host {}: Found Prompt: {}".format(self.host, repr(prompt)))
+        self._logger.debug("Host %s: Found Prompt: %s"%(self.host, repr(prompt)))
         return prompt
 
     async def send_command(
@@ -320,11 +320,11 @@ class BaseDevice(object):
                             and set  NET_TEXTFSM environment to pint to ./ntc-templates/templates
         :return: The output of the command
         """
-        self._logger.info("Host {}: Sending command".format(self.host))
+        self._logger.info("Host %s: Sending command"%(self.host))
 
         command_string = self._normalize_cmd(command_string)
         self._logger.debug(
-            "Host {}: Send command: {}".format(self.host, repr(command_string))
+            "Host %s: Send command: %s"%(self.host, repr(command_string))
         )
 
         output = await self._send_command_expect(command_string, pattern, re_flags)
@@ -339,11 +339,11 @@ class BaseDevice(object):
             output = self._strip_command(command_string, output)
 
         if use_textfsm:
-            self._logger.info("Host {}: parsing output using texfsm, command=%r,".format(self.host, command_string))
+            self._logger.info("Host %s: parsing output using texfsm, command=%r,"%(self.host, command_string))
             output = utils.get_structured_data(output, self._device_type, command_string)
 
         logger.debug(
-            "Host {}: Send command output: {}".format(self.host, repr(output))
+            "Host %s: Send command output: %s"%(self.host, repr(output))
         )
         return output
 

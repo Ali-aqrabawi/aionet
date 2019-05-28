@@ -1,5 +1,5 @@
 """
-Logging configuration for aionet
+Logging Module
 """
 import logging
 

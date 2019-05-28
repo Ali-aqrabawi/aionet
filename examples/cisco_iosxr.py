@@ -30,7 +30,7 @@ async def task(param):
         try:
             commands = ["interface GigabitEthernet 0/0/0/0", "service-policy input 2"]
             await iosxr.send_config_set(commands)
-        except aionet.CommitError:
+        except aionet.AionetCommitError:
             print("Commit Error")
 
 

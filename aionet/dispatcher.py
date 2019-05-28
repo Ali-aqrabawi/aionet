@@ -1,5 +1,6 @@
 """
-Factory function for creating aionet classes
+Device Dispatcher
+
 """
 from aionet.vendors.devices import AristaEOS
 from aionet.vendors.devices import ArubaAOS6, ArubaAOS8
@@ -11,9 +12,8 @@ from aionet.vendors.devices import MikrotikRouterOS
 from aionet.vendors.devices import Terminal
 from aionet.vendors.devices import UbiquityEdgeSwitch
 
-# @formatter:off
-# The keys of this dictionary are the supported device_types
-CLASS_MAPPER = {
+
+DEVICE_MAPPER = {
     "arista_eos": AristaEOS,
     "aruba_aos_6": ArubaAOS6,
     "aruba_aos_8": ArubaAOS8,
@@ -31,19 +31,17 @@ CLASS_MAPPER = {
     "terminal": Terminal,
 }
 
-# @formatter:on
 
-platforms = list(CLASS_MAPPER.keys())
+platforms = list(DEVICE_MAPPER.keys())
 platforms.sort()
 platforms_str = u"\n".join(platforms)
 
 
-def create(*args, **kwargs):
-    """Factory function selects the proper class and creates object based on device_type"""
+def ConnectionHandler(*args, **kwargs):
     if kwargs["device_type"] not in platforms:
         raise ValueError(
             "Unsupported device_type: "
             "currently supported platforms are: {0}".format(platforms_str)
         )
-    connection_class = CLASS_MAPPER[kwargs["device_type"]]
+    connection_class = DEVICE_MAPPER[kwargs["device_type"]]
     return connection_class(*args, **kwargs)

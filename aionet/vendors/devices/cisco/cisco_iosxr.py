@@ -1,4 +1,4 @@
-from aionet.exceptions import CommitError
+from aionet.exceptions import AionetCommitError
 from aionet.vendors.terminal_modes.cisco import IOSxrConfigMode
 from aionet.vendors.devices.ios_like import IOSLikeDevice
 
@@ -69,12 +69,12 @@ class CiscoIOSXR(IOSLikeDevice):
             if "Failed to commit" in output:
                 show_config_failed = type(self)._show_config_failed
                 reason = await self._send_command_expect(show_config_failed)
-                raise CommitError(self.host, reason)
+                raise AionetCommitError(self.host, reason)
             if "One or more commits have occurred" in output:
                 show_commit_changes = type(self)._show_commit_changes
                 await self._send_command_expect('no')
                 reason = await self._send_command_expect(show_commit_changes)
-                raise CommitError(self.host, reason)
+                raise AionetCommitError(self.host, reason)
 
         if exit_config_mode:
             output += await self.config_mode.exit()

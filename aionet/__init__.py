@@ -1,15 +1,14 @@
-import aionet.vendors
-from aionet.dispatcher import create, platforms
-from aionet.exceptions import DisconnectError, TimeoutError, CommitError
+from aionet.dispatcher import ConnectionHandler, platforms
+from aionet.exceptions import AionetDisconnectError, AionetTimeoutError, AionetCommitError
 from aionet.logger import logger
 from aionet.version import __author__, __author_email__, __url__, __version__
 
 __all__ = (
-    "create",
+    "ConnectionHandler",
     "platforms",
     "logger",
-    "DisconnectError",
-    "TimeoutError",
-    "CommitError",
+    "AionetDisconnectError",
+    "AionetTimeoutError",
+    "AionetCommitError",
     "vendors",
 )

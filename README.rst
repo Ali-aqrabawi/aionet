@@ -44,15 +44,15 @@ Example of interacting with Cisco IOS devices:
     import asyncio
     import aionet
 
-    async def task(param):
-        async with aionet.ConnectionHandler(**param) as conn:
-            # for sending command
+    async def task(device):
+        async with aionet.ConnectionHandler(**device) as conn:
+
             out = await conn.send_command("show ver")
             print(out)
-            # for config commands
-            commands = ["interface vlan1", "ip address 4.4.4.4 255.255.255.255"]
-            out = await conn.send_config_set(commands)
-            print(out)
+
+            commands = ["interface vlan2", "no shut"]
+            out = await ios.send_config_set(commands)
+
 
 
     async def run():

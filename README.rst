@@ -51,7 +51,7 @@ Example of interacting with Cisco IOS devices:
             print(out)
 
             commands = ["interface vlan2", "no shut"]
-            out = await ios.send_config_set(commands)
+            out = await conn.send_config_set(commands)
 
 
 

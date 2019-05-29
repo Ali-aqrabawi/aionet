@@ -11,14 +11,14 @@ class EnableMode(BaseTerminalMode):
 
     async def enter(self):
         """ Enter Enable Mode """
-        self._logger.info("Host {}: Entering to {}".format(self.device.host, self.name))
+        self._logger.info("Entering to %s" % self.name)
         if await self.check():
             return ""
         output = await self.device.send_command(self._enter_command, pattern="Password")
         if "Password" in output:
             await self.device.send_command(self.device.secret)
         if not await self.check():
-            raise ValueError("Failed to enter to {}".format(self.name))
+            raise ValueError("Failed to enter to %s" % self.name)
         self.device.current_terminal = self
         return output
 
@@ -34,7 +34,7 @@ class IOSxrConfigMode(ConfigMode):
 
     async def exit(self):
         """Exit from configuration mode"""
-        self._logger.info("Host {}: Exiting from configuration mode".format(self.device.host))
+        self._logger.info("Exiting from configuration mode")
 
         if not await self.check():
             return ""

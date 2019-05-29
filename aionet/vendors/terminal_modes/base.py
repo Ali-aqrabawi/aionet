@@ -2,7 +2,7 @@
 Terminal Modes Classes, which handle entering and exist to
 different terminal modes
 """
-from aionet.logger import logger
+from aionet.logging import logger
 
 
 class BaseTerminalMode:
@@ -43,7 +43,7 @@ class BaseTerminalMode:
 
     @property
     def _logger(self):
-        return logger
+        return self.device._logger
 
     async def check(self, force=False):
         """Check if are in configuration mode. Return boolean"""
@@ -55,18 +55,18 @@ class BaseTerminalMode:
 
     async def enter(self):
         """ enter terminal mode """
-        self._logger.info("Host {}: Entering to {}".format(self.device.host, self.name))
+        self._logger.info("Entering to %s" % self.name)
         if await self.check():
             return ""
         output = await self.device.send_command(self._enter_command, pattern="Password")
         if not await self.check():
-            raise ValueError("Failed to enter to {}".format(self.name))
+            raise ValueError("Failed to enter to %s" % self.name)
         self.device.current_terminal = self
         return output
 
     async def exit(self):
         """ exit terminal mode """
-        self._logger.info("Host {}: Exiting from {}".format(self.device.host, self.name))
+        self._logger.info("Host {}: Exiting from %s" % self.name)
         if not await self.check():
             return ""
         if self.device.current_terminal != self:
@@ -74,7 +74,7 @@ class BaseTerminalMode:
 
         output = await self.device.send_command(self._exit_command)
         if await self.check(force=True):
-            raise ValueError("Failed to Exit from {}".format(self.name))
+            raise ValueError("Failed to Exit from %s" % self.name)
         self.device.current_terminal = self._parent
         return output
 

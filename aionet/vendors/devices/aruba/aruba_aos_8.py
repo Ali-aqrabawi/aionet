@@ -2,10 +2,10 @@
 
 import re
 
-from aionet.vendors.devices.ios_like import IOSLikeDevice
+from aionet.vendors.devices.base_ios import BaseIOSDevice
 
 
-class ArubaAOS8(IOSLikeDevice):
+class ArubaAOS8(BaseIOSDevice):
     """Class for working with Aruba OS 8.X"""
 
     _disable_paging_command = "no paging"
@@ -39,6 +39,6 @@ class ArubaAOS8(IOSLikeDevice):
         base_prompt = re.escape(self._base_prompt[:12])
         pattern = type(self)._pattern
         self._base_pattern = pattern.format(prompt=base_prompt, delimiters=delimiters)
-        self._logger.debug("Host {}: Base Prompt: {}".format(self.host, self._base_prompt))
-        self._logger.debug("Host {}: Base Pattern: {}".format(self.host, self._base_pattern))
+        self._logger.debug("Base Prompt: %s" % self._base_prompt)
+        self._logger.debug("Base Pattern: %s" % self._base_pattern)
         return self._base_prompt

@@ -8,7 +8,7 @@ from aionet.vendors.devices.base import BaseDevice
 from aionet.vendors.terminal_modes.cisco import EnableMode, ConfigMode
 
 
-class IOSLikeDevice(BaseDevice):
+class BaseIOSDevice(BaseDevice):
     """
     This Class is abstract class for working with Cisco IOS like devices
 
@@ -98,12 +98,11 @@ class IOSLikeDevice(BaseDevice):
         if exit_config_mode:
             output += await self.config_mode.exit()
 
-        self._logger.debug(
-            "Host {}: Config commands output: {}".format(self.host, repr(output))
-        )
+        self._logger.debug("Config commands output: %s"%repr(output))
+
         return output
 
     async def _cleanup(self):
         """ Any needed cleanup before closing connection """
-        self._logger.info("Host {}: Cleanup session".format(self.host))
+        self._logger.info("Cleanup session")
         await self.config_mode.exit()

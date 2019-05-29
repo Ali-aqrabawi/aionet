@@ -5,7 +5,8 @@ Base Device
 import asyncio
 import re
 
-from aionet.logger import logger
+# from aionet.logger import logger
+from aionet.logging import logger, aionetLoggerAdapter
 from aionet.version import __version__
 from aionet import utils
 from aionet.connections import SSHConnection, TelnetConnection
@@ -175,6 +176,9 @@ class BaseDevice(object):
 
         self._ansi_escape_codes = False
 
+        self._logger = aionetLoggerAdapter(logger, extra={'host': self.host})
+        self._logger._host = self.host
+
     _delimiter_list = [">", "#"]
     """All this characters will stop reading from buffer. It mean the end of device prompt"""
 
@@ -193,10 +197,6 @@ class BaseDevice(object):
         """Async Context Manager"""
         await self.disconnect()
 
-    @property
-    def _logger(self):
-        return logger
-
     async def connect(self):
         """
         Basic asynchronous connection method
@@ -208,18 +208,14 @@ class BaseDevice(object):
         * _set_base_prompt() for finding and setting device prompt
         * _disable_paging() for non interactive output in commands
         """
-        self._logger.info("Host %s: Trying to connect to the device" % (self.host))
+        self._logger.info("Trying to connect to the device")
         await self._establish_connection()
         await self._session_preparation()
-
-        logger.info("Host %s: Has connected to the device" % (self.host))
+        logger.info("Has connected to the device")
 
     async def _establish_connection(self):
         """Establishing SSH connection to the network device"""
-        self._logger.info(
-            "Host %s: Establishing connection " % (self.host)
-        )
-
+        self._logger.info("Establishing connection")
         # initiate SSH connection
         if self._protocol == 'ssh':
             conn = SSHConnection(**self._ssh_connect_params_dict)
@@ -230,7 +226,7 @@ class BaseDevice(object):
 
         await conn.connect()
         self._conn = conn
-        self._logger.info("Host %s: Connection is established" % (self.host))
+        self._logger.info("Connection is established")
 
     async def _session_preparation(self):
         """ Prepare session before start using it """
@@ -239,7 +235,7 @@ class BaseDevice(object):
 
     async def _flush_buffer(self):
         """ flush unnecessary data """
-        self._logger.debug("Host %s: Flushing buffers" % (self.host))
+        self._logger.debug("Flushing buffers")
 
         delimiters = map(re.escape, type(self)._delimiter_list)
         delimiters = r"|".join(delimiters)
@@ -249,7 +245,7 @@ class BaseDevice(object):
     async def _disable_paging(self):
         """ disable terminal pagination """
         self._logger.info(
-            "Host %s: Disabling Pagination, command = %r" % (self.host, type(self)._disable_paging_command))
+            "Disabling Pagination, command = %r" % type(self)._disable_paging_command)
         await self._send_command_expect(type(self)._disable_paging_command)
 
     async def _set_base_prompt(self):
@@ -261,7 +257,7 @@ class BaseDevice(object):
 
         For Cisco devices base_pattern is "prompt(\(.*?\))?[#|>]
         """
-        self._logger.info("Host %s: Setting base prompt" % (self.host))
+        self._logger.info("Setting base prompt")
         prompt = await self._find_prompt()
 
         # Strip off trailing terminator
@@ -275,15 +271,15 @@ class BaseDevice(object):
         base_prompt = re.escape(base_prompt[:12])
         pattern = type(self)._pattern
         base_pattern = pattern.format(prompt=base_prompt, delimiters=delimiters)
-        self._logger.debug("Host %s: Base Prompt: %s" % (self.host, base_prompt))
-        self._logger.debug("Host %s: Base Pattern: %s" % (self.host, base_pattern))
+        self._logger.debug("Base Prompt: %s" % base_prompt)
+        self._logger.debug("Base Pattern: %s" % base_pattern)
         if not base_pattern:
             raise ValueError("unable to find base_pattern")
         self._conn.set_base_pattern(base_pattern)
 
     async def _find_prompt(self):
         """Finds the current network device prompt, last line only"""
-        self._logger.info("Host %s: Finding prompt" % (self.host))
+        self._logger.info("Finding prompt")
         await self.send_new_line(dont_read=True)
         delimiters = map(re.escape, type(self)._delimiter_list)
         delimiters = r"|".join(delimiters)
@@ -293,9 +289,9 @@ class BaseDevice(object):
             prompt = self._strip_ansi_escape_codes(prompt)
         if not prompt:
             raise ValueError(
-                "Host %s: Unable to find prompt: %s"%(self.host, repr(prompt))
+                "Host %s: Unable to find prompt: %s" % (self.host, repr(prompt))
             )
-        self._logger.debug("Host %s: Found Prompt: %s"%(self.host, repr(prompt)))
+        self._logger.debug("Found Prompt: %s" % repr(prompt))
         return prompt
 
     async def send_command(
@@ -320,11 +316,11 @@ class BaseDevice(object):
                             and set  NET_TEXTFSM environment to pint to ./ntc-templates/templates
         :return: The output of the command
         """
-        self._logger.info("Host %s: Sending command"%(self.host))
+        self._logger.info("Sending command")
 
         command_string = self._normalize_cmd(command_string)
         self._logger.debug(
-            "Host %s: Send command: %s"%(self.host, repr(command_string))
+            "Send command: %s" % repr(command_string)
         )
 
         output = await self._send_command_expect(command_string, pattern, re_flags)
@@ -339,17 +335,17 @@ class BaseDevice(object):
             output = self._strip_command(command_string, output)
 
         if use_textfsm:
-            self._logger.info("Host %s: parsing output using texfsm, command=%r,"%(self.host, command_string))
+            self._logger.info("parsing output using texfsm, command=%r," % command_string)
             output = utils.get_structured_data(output, self._device_type, command_string)
 
         logger.debug(
-            "Host %s: Send command output: %s"%(self.host, repr(output))
+            "Host %s: Send command output: %s" % (self.host, repr(output))
         )
         return output
 
     def _strip_prompt(self, a_string):
         """Strip the trailing router prompt from the output"""
-        self._logger.info("Host {}: Stripping prompt".format(self.host))
+        self._logger.info("Stripping prompt")
         response_list = a_string.split("\n")
         last_line = response_list[-1]
         if self._conn._base_prompt in last_line:
@@ -421,18 +417,13 @@ class BaseDevice(object):
         :param list config_commands: iterable string list with commands for applying to network device
         :return: The output of this commands
         """
-        self._logger.info("Host {}: Sending configuration settings".format(self.host))
+        self._logger.info("Sending configuration settings")
+        assert isinstance(config_commands, list), "config_commands must be list not %s" % type(config_commands)
         if config_commands is None:
             return ""
-        if not hasattr(config_commands, "__iter__"):
-            raise ValueError(
-                "Host {}: Invalid argument passed into send_config_set".format(
-                    self.host
-                )
-            )
 
         # Send config commands
-        self._logger.debug("Host {}: Config commands: {}".format(self.host, config_commands))
+        self._logger.debug("Config commands: %s" % config_commands)
         output = ""
         for cmd in config_commands:
             output += await self._send_command_expect(cmd)
@@ -442,7 +433,7 @@ class BaseDevice(object):
 
         output = self._normalize_linefeeds(output)
         self._logger.debug(
-            "Host {}: Config commands output: {}".format(self.host, repr(output))
+            "Config commands output: %s" % repr(output)
         )
         return output
 
@@ -452,5 +443,5 @@ class BaseDevice(object):
 
     async def disconnect(self):
         """ Gracefully close the SSH connection """
-        self._logger.info("Host {}: Disconnecting".format(self.host))
+        self._logger.info("Disconnecting")
         await self._conn.close()

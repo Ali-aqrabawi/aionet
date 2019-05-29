@@ -1,7 +1,7 @@
-from aionet.vendors.devices.ios_like import IOSLikeDevice
+from aionet.vendors.devices.base_ios import BaseIOSDevice
 
 
-class CiscoIOS(IOSLikeDevice):
+class CiscoIOS(BaseIOSDevice):
     """Class for working with Cisco IOS/IOS XE"""
 
     pass

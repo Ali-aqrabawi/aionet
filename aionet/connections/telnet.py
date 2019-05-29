@@ -2,7 +2,7 @@
 Telnet Connection Module
 """
 import asyncio
-from aionet.exceptions import AionetDisconnectError, AionetTimeoutError
+from aionet.exceptions import AionetAuthenticationError, AionetTimeoutError
 from aionet.connections.base import BaseConnection
 
 
@@ -44,7 +44,7 @@ class TelnetConnection(BaseConnection):
         output += await self.read_until_prompt()
         self.send('\n')
         if 'Login invalid' in output:
-            raise AionetDisconnectError(self._host, None, "authentication failed")
+            raise AionetAuthenticationError(self._host, None, "authentication failed")
 
     def __check_session(self):
         if not self._stdin:
@@ -60,7 +60,7 @@ class TelnetConnection(BaseConnection):
         except asyncio.TimeoutError:
             raise AionetTimeoutError(self._host)
         except Exception as e:
-            raise AionetDisconnectError(self._host, None, str(e))
+            raise AionetAuthenticationError(self._host, None, str(e))
 
         yield from self._start_session()
 

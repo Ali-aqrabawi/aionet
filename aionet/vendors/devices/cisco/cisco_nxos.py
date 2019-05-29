@@ -1,9 +1,9 @@
 import re
 
-from aionet.vendors.devices.ios_like import IOSLikeDevice
+from aionet.vendors.devices.base_ios import BaseIOSDevice
 
 
-class CiscoNXOS(IOSLikeDevice):
+class CiscoNXOS(BaseIOSDevice):
     """Class for working with Cisco Nexus/NX-OS"""
 
     @staticmethod

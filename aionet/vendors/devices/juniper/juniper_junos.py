@@ -1,8 +1,8 @@
 from aionet.vendors.terminal_modes.juniper import CliMode
-from aionet.vendors.devices.junos_like import JunOSLikeDevice
+from aionet.vendors.devices.base_junos import BAseJunOSDevice
 
 
-class JuniperJunOS(JunOSLikeDevice):
+class JuniperJunOS(BAseJunOSDevice):
     """Class for working with Juniper JunOS"""
 
     def __init__(self, *args, **kwargs):

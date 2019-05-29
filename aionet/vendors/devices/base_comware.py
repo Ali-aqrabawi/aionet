@@ -10,7 +10,7 @@ from aionet.vendors.terminal_modes.hp import SystemView
 from aionet.vendors.devices.base import BaseDevice
 
 
-class ComwareLikeDevice(BaseDevice):
+class BaseComwareDevice(BaseDevice):
     """
     This Class for working with hp comware like devices
 
@@ -65,7 +65,7 @@ class ComwareLikeDevice(BaseDevice):
 
         For Comware devices base_pattern is "[\]|>]prompt(\-\w+)?[\]|>]
         """
-        self._logger.info("Host {}: Setting base prompt".format(self.host))
+        self._logger.info("Setting base prompt")
         prompt = await self._find_prompt()
         # Strip off trailing terminator
         self._base_prompt = prompt[1:-1]
@@ -80,8 +80,8 @@ class ComwareLikeDevice(BaseDevice):
             prompt=base_prompt,
             delimiter_right=delimiter_right,
         )
-        self._logger.debug("Host {}: Base Prompt: {}".format(self.host, self._base_prompt))
-        self._logger.debug("Host {}: Base Pattern: {}".format(self.host, self._base_pattern))
+        self._logger.debug("Base Prompt: %s" % self._base_prompt)
+        self._logger.debug("Base Pattern: %s" % self._base_pattern)
         return self._base_prompt
 
     async def send_config_set(self, config_commands=None, exit_system_view=False):
@@ -105,7 +105,5 @@ class ComwareLikeDevice(BaseDevice):
             output += await self.system_view.exit()
 
         output = self._normalize_linefeeds(output)
-        self._logger.debug(
-            "Host {}: Config commands output: {}".format(self.host, repr(output))
-        )
+        self._logger.debug("Config commands output: %s" % repr(output))
         return output

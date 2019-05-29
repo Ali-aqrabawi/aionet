@@ -1,7 +1,7 @@
-from aionet.vendors.devices.comware_like import ComwareLikeDevice
+from aionet.vendors.devices.base_comware import BaseComwareDevice
 
 
-class HPComware(ComwareLikeDevice):
+class HPComware(BaseComwareDevice):
     """Class for working with HP Comware"""
 
     pass

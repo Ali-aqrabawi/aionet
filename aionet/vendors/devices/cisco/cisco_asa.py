@@ -1,9 +1,9 @@
 """Subclass specific to Cisco ASA"""
 
-from aionet.vendors.devices.ios_like import IOSLikeDevice
+from aionet.vendors.devices.base_ios import BaseIOSDevice
 
 
-class CiscoASA(IOSLikeDevice):
+class CiscoASA(BaseIOSDevice):
     """Class for working with Cisco ASA"""
 
     def __init__(self, *args, **kwargs):
@@ -39,11 +39,9 @@ class CiscoASA(IOSLikeDevice):
 
     async def _check_multiple_mode(self):
         """Check mode multiple. If mode is multiple we adding info about contexts"""
-        self._logger.info("Host {}:Checking multiple mode".format(self.host))
+        self._logger.info("Checking multiple mode")
         out = await self._send_command_expect("show mode")
         if "multiple" in out:
             self._multiple_mode = True
 
-        self._logger.debug(
-            "Host {}: Multiple mode: {}".format(self.host, self._multiple_mode)
-        )
+        self._logger.debug("Multiple mode: %s" % self._multiple_mode)

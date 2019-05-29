@@ -10,7 +10,7 @@ from aionet.vendors.terminal_modes.juniper import ConfigMode
 from aionet.vendors.devices.base import BaseDevice
 
 
-class JunOSLikeDevice(BaseDevice):
+class BAseJunOSDevice(BaseDevice):
     """
     JunOSLikeDevice Class for working with Juniper JunOS like devices
 
@@ -66,7 +66,7 @@ class JunOSLikeDevice(BaseDevice):
 
         For JunOS devices base_pattern is "user(@[hostname])?[>|#]
         """
-        self._logger.info("Host {}: Setting base prompt".format(self.host))
+        self._logger.info("Setting base prompt")
         prompt = await self._find_prompt()
         prompt = prompt[:-1]
         # Strip off trailing terminator
@@ -78,8 +78,8 @@ class JunOSLikeDevice(BaseDevice):
         base_prompt = re.escape(self._base_prompt[:12])
         pattern = type(self)._pattern
         self._base_pattern = pattern.format(delimiters=delimiters)
-        self._logger.debug("Host {}: Base Prompt: {}".format(self.host, self._base_prompt))
-        self._logger.debug("Host {}: Base Pattern: {}".format(self.host, self._base_pattern))
+        self._logger.debug("Base Prompt: %s" % self._base_prompt)
+        self._logger.debug("Base Pattern: %s" % self._base_pattern)
         return self._base_prompt
 
     async def send_config_set(
@@ -116,7 +116,6 @@ class JunOSLikeDevice(BaseDevice):
         if exit_config_mode:
             output += await self.config_mode.exit()
 
-        self._logger.debug(
-            "Host {}: Config commands output: {}".format(self.host, repr(output))
-        )
+        self._logger.debug("Config commands output: %s" % repr(output))
+
         return output

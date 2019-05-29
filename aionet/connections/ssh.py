@@ -4,7 +4,7 @@ SSH Connection Module
 import asyncio
 import asyncssh
 from aionet.constants import TERM_LEN, TERM_WID, TERM_TYPE
-from aionet.exceptions import AionetDisconnectError
+from aionet.exceptions import AionetAuthenticationError
 from aionet.connections.base import BaseConnection
 
 
@@ -79,7 +79,7 @@ class SSHConnection(BaseConnection):
         try:
             self._conn = await asyncio.wait_for(fut, self._timeout)
         except asyncssh.DisconnectError as e:
-            raise AionetDisconnectError(self._host, e.code, e.reason)
+            raise AionetAuthenticationError(self._host, e.code, e.reason)
         except asyncio.TimeoutError:
             raise TimeoutError(self._host)
 

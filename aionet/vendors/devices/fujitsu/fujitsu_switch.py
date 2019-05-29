@@ -2,10 +2,10 @@
 
 import re
 
-from aionet.vendors.devices.ios_like import IOSLikeDevice
+from aionet.vendors.devices.base_ios import BaseIOSDevice
 
 
-class FujitsuSwitch(IOSLikeDevice):
+class FujitsuSwitch(BaseIOSDevice):
     """Class for working with Fujitsu Blade switch"""
 
     _pattern = r"\({prompt}.*?\) (\(.*?\))?[{delimiters}]"
@@ -25,7 +25,7 @@ class FujitsuSwitch(IOSLikeDevice):
 
         For Fujitsu devices base_pattern is "(prompt) (\(.*?\))?[>|#]"
         """
-        self._logger.info("Host {}: Setting base prompt".format(self.host))
+        self._logger.info("Setting base prompt")
         prompt = await self._find_prompt()
         # Strip off trailing terminator
         self._base_prompt = prompt[1:-3]
@@ -34,8 +34,8 @@ class FujitsuSwitch(IOSLikeDevice):
         base_prompt = re.escape(self._base_prompt[:12])
         pattern = type(self)._pattern
         self._base_pattern = pattern.format(prompt=base_prompt, delimiters=delimiters)
-        self._logger.debug("Host {}: Base Prompt: {}".format(self.host, self._base_prompt))
-        self._logger.debug("Host {}: Base Pattern: {}".format(self.host, self._base_pattern))
+        self._logger.debug("Base Prompt: %s" % self._base_prompt)
+        self._logger.debug("Base Pattern: %s" % self._base_pattern)
         return self._base_prompt
 
     @staticmethod

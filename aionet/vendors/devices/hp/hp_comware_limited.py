@@ -1,8 +1,8 @@
 from aionet.vendors.terminal_modes.hp import CmdLineMode
-from aionet.vendors.devices.comware_like import ComwareLikeDevice
+from aionet.vendors.devices.base_comware import BaseComwareDevice
 
 
-class HPComwareLimited(ComwareLikeDevice):
+class HPComwareLimited(BaseComwareDevice):
     """Class for working with HP Comware Limited like 1910 and 1920 models"""
 
     def __init__(self, cmdline_password=u"", *args, **kwargs):

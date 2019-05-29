@@ -1,7 +1,7 @@
-from aionet.vendors.devices.ios_like import IOSLikeDevice
+from aionet.vendors.devices.base_ios import BaseIOSDevice
 
 
-class AristaEOS(IOSLikeDevice):
+class AristaEOS(BaseIOSDevice):
     """Class for working with Arista EOS"""
 
     pass

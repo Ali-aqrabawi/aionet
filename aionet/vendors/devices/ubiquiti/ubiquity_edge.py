@@ -1,10 +1,10 @@
 """Subclass specific to Ubiquity Edge Switch"""
 import re
 
-from aionet.vendors.devices.ios_like import IOSLikeDevice
+from aionet.vendors.devices.base_ios import BaseIOSDevice
 
 
-class UbiquityEdgeSwitch(IOSLikeDevice):
+class UbiquityEdgeSwitch(BaseIOSDevice):
     """Class for working with Ubiquity Edge Switches"""
 
     _pattern = r"\({prompt}.*?\) (\(.*?\))?[{delimiters}]"
@@ -21,7 +21,7 @@ class UbiquityEdgeSwitch(IOSLikeDevice):
 
         For Ubiquity devices base_pattern is "(prompt) (\(.*?\))?[>|#]"
         """
-        self._logger.info("Host {}: Setting base prompt".format(self.host))
+        self._logger.info("Setting base prompt")
         prompt = await self._find_prompt()
         # Strip off trailing terminator
         base_prompt = prompt[1:-3]
@@ -31,6 +31,6 @@ class UbiquityEdgeSwitch(IOSLikeDevice):
         base_prompt = re.escape(base_prompt[:12])
         pattern = type(self)._pattern
         base_pattern = pattern.format(prompt=base_prompt, delimiters=delimiters)
-        self._logger.debug("Host {}: Base Prompt: {}".format(self.host, base_prompt))
-        self._logger.debug("Host {}: Base Pattern: {}".format(self.host, base_pattern))
+        self._logger.debug("Base Prompt: %s" % base_prompt)
+        self._logger.debug("Base Pattern: %s" % base_pattern)
         self._conn.set_base_pattern(base_pattern)

@@ -1,9 +1,9 @@
 from aionet.exceptions import AionetCommitError
 from aionet.vendors.terminal_modes.cisco import IOSxrConfigMode
-from aionet.vendors.devices.ios_like import IOSLikeDevice
+from aionet.vendors.devices.base_ios import BaseIOSDevice
 
 
-class CiscoIOSXR(IOSLikeDevice):
+class CiscoIOSXR(BaseIOSDevice):
     """Class for working with Cisco IOS XR"""
 
     _commit_command = "commit"
@@ -54,7 +54,7 @@ class CiscoIOSXR(IOSLikeDevice):
 
         # Send config commands
         output = await self.config_mode()
-        output += await super(IOSLikeDevice, self).send_config_set(
+        output += await super(BaseIOSDevice, self).send_config_set(
             config_commands=config_commands
         )
         if with_commit:
@@ -79,13 +79,12 @@ class CiscoIOSXR(IOSLikeDevice):
         if exit_config_mode:
             output += await self.config_mode.exit()
 
-        self._logger.debug(
-            "Host {}: Config commands output: {}".format(self.host, repr(output))
-        )
+        self._logger.debug("config commands output: %s" % repr(output))
+
         return output
 
     async def _cleanup(self):
         """ Any needed cleanup before closing connection """
         abort = type(self)._abort_command
         await self._send_command_expect(abort)
-        self._logger.info("Host {}: Cleanup session".format(self.host))
+        self._logger.info("Cleanup session")

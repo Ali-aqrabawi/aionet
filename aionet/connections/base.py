@@ -3,7 +3,7 @@ Base Connection Module
 """
 import re
 import asyncio
-from aionet.logger import logger
+from aionet.logging import logger
 from aionet.connections.interface import IConnection
 
 

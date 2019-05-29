@@ -36,10 +36,10 @@ class Terminal(BaseDevice):
 
     async def _set_base_prompt(self):
         """Setting base pattern"""
-        self._logger.info("Host {}: Setting base prompt".format(self.host))
+        self._logger.info("Setting base prompt")
         delimiters = map(re.escape, type(self)._delimiter_list)
         delimiters = r"|".join(delimiters)
         pattern = type(self)._pattern
         base_pattern = pattern.format(delimiters=delimiters)
-        self._logger.debug("Host {}: Base Pattern: {}".format(self.host, base_pattern))
+        self._logger.debug("Base Pattern: %s"% base_pattern)
         self._conn.set_base_pattern(base_pattern)

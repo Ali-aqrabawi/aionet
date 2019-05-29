@@ -1,7 +1,7 @@
 """
 Hp Terminal Modes
 """
-from aionet.logger import logger
+from aionet.logging import logger
 from aionet.vendors.terminal_modes.base import BaseTerminalMode
 
 
@@ -28,18 +28,21 @@ class CmdLineMode:
     def __call__(self, *args, **kwargs):
         return self.enter()
 
+    @property
+    def _logger(self):
+        return self.device._logger
+
     async def enter(self):
         """Entering to cmdline-mode"""
-        logger.info("Host {}: Entering to cmdline mode".format(self.device.host))
+        self._logger.info("Entering to cmdline mode")
 
         output = await self.device.send_command(self._enter_command, pattern="\[Y\/N\]")
         output += await self.device.send_command("Y", pattern="password\:")
         output += await self.device.send_command(self._password)
 
-        logger.debug(
-            "Host {}: cmdline mode output: {}".format(self.device.host, repr(output))
-        )
-        logger.info("Host {}: Checking cmdline mode".format(self.device.host))
+        logger.debug("cmdline mode output: %s" % repr(output))
+
+        logger.info("Checking cmdline mode")
         if self._check_error_string in output:
             raise ValueError("Failed to enter to cmdline mode")
         self.device.current_terminal = self

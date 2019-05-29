@@ -45,21 +45,13 @@ Example of interacting with Cisco IOS devices:
     import aionet
 
     async def task(param):
-        async with aionet.create(**param) as ios:
-            # Testing sending simple command
-            out = await ios.send_command("show ver")
+        async with aionet.ConnectionHandler(**param) as conn:
+            # for sending command
+            out = await conn.send_command("show ver")
             print(out)
-            # Testing sending configuration set
-            commands = ["line console 0", "exit"]
-            out = await ios.send_config_set(commands)
-            print(out)
-            # Testing sending simple command with long output
-            out = await ios.send_command("show run")
-            print(out)
-            # Testing interactive dialog
-            out = await ios.send_command("conf", pattern=r'\[terminal\]\?', strip_command=False)
-            out += await ios.send_command("term", strip_command=False)
-            out += await ios.send_command("exit", strip_command=False, strip_prompt=False)
+            # for config commands
+            commands = ["interface vlan1", "ip address 4.4.4.4 255.255.255.255"]
+            out = await conn.send_config_set(commands)
             print(out)
 
 

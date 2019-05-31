@@ -16,7 +16,7 @@ class BaseDevice(object):
 
     def __init__(
             self,
-            host=u"",
+            ip=u"",
             username=u"",
             password=u"",
             port=None,
@@ -43,7 +43,7 @@ class BaseDevice(object):
         """
         Initialize base class for asynchronous working with network devices
 
-        :param host: device hostname or ip address for connection
+        :param ip: ip address for connection
         :param username: username for logging to device
         :param password: user password for logging to device
         :param port: port number. Default is 22 for ssh and 23 for telnet
@@ -121,8 +121,8 @@ class BaseDevice(object):
         :type compression_algs: list[str]
         :type signature_algs: list[str]
         """
-        if host:
-            self.host = host
+        if ip:
+            self.host = ip
         else:
             raise ValueError("Host must be set")
 
@@ -246,7 +246,7 @@ class BaseDevice(object):
         """ disable terminal pagination """
         self._logger.info(
             "Disabling Pagination, command = %r" % type(self)._disable_paging_command)
-        await self._send_command_expect(type(self)._disable_paging_command)
+        await self.send_command_expect(type(self)._disable_paging_command)
 
     async def _set_base_prompt(self):
         """
@@ -294,6 +294,21 @@ class BaseDevice(object):
         self._logger.debug("Found Prompt: %s" % repr(prompt))
         return prompt
 
+    async def send_command_timing(self,
+                                  command_string,
+                                  read_for_seconds=2):
+        """
+        send command and keep reading for the specified time in wait or until_prompt
+        :param command_string: command
+        :type command_string: str
+        :param read_for_seconds: seconds of reading
+        :type read_for_seconds: int
+        :return: command output
+        """
+
+        output = await self.send_command_expect(command_string, read_for=read_for_seconds)
+        return output
+
     async def send_command(
             self,
             command_string,
@@ -323,7 +338,7 @@ class BaseDevice(object):
             "Send command: %s" % repr(command_string)
         )
 
-        output = await self._send_command_expect(command_string, pattern, re_flags)
+        output = await self.send_command_expect(command_string, pattern, re_flags)
 
         # Some platforms have ansi_escape codes
         if self._ansi_escape_codes:
@@ -393,18 +408,18 @@ class BaseDevice(object):
 
     async def send_new_line(self, pattern='', dont_read=False):
         """ Sending new line """
-        return await self._send_command_expect('\n', pattern=pattern, dont_read=dont_read)
+        return await self.send_command_expect('\n', pattern=pattern, dont_read=dont_read)
 
-    async def _send_command_expect(self, command, pattern='', re_flags=0, dont_read=False):
+    async def send_command_expect(self, command, pattern='', re_flags=0, dont_read=False, read_for=0):
         """ Send a single line of command and readuntil prompte"""
         self._conn.send(self._normalize_cmd(command))
         if dont_read:
             return ''
         if pattern:
-            output = await self._conn.read_until_prompt_or_pattern(pattern, re_flags)
+            output = await self._conn.read_until_prompt_or_pattern(pattern, re_flags, read_for=read_for)
 
         else:
-            output = await self._conn.read_until_prompt()
+            output = await self._conn.read_until_prompt(read_for=read_for)
 
         return output
 
@@ -426,7 +441,7 @@ class BaseDevice(object):
         self._logger.debug("Config commands: %s" % config_commands)
         output = ""
         for cmd in config_commands:
-            output += await self._send_command_expect(cmd)
+            output += await self.send_command_expect(cmd)
 
         if self._ansi_escape_codes:
             output = self._strip_ansi_escape_codes(output)

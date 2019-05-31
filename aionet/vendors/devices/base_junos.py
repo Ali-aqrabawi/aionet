@@ -111,7 +111,7 @@ class BAseJunOSDevice(BaseDevice):
             if commit_comment:
                 commit = type(self)._commit_comment_command.format(commit_comment)
 
-            output += await self._send_command_expect(commit)
+            output += await self.send_command_expect(commit)
 
         if exit_config_mode:
             output += await self.config_mode.exit()

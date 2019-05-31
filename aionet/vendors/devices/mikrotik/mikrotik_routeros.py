@@ -62,7 +62,7 @@ class MikrotikRouterOS(BaseDevice):
     async def _find_prompt(self):
         """Finds the current network device prompt, last line only."""
         self._logger.info("Finding prompt")
-        prompt = await self._send_command_expect("\r")
+        prompt = await self.send_command_expect("\r")
         prompt = prompt.strip()
         if self._ansi_escape_codes:
             prompt = self._strip_ansi_escape_codes(prompt)

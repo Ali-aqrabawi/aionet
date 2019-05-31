@@ -62,18 +62,18 @@ class CiscoIOSXR(BaseIOSDevice):
             if commit_comment:
                 commit = type(self)._commit_comment_command.format(commit_comment)
 
-            output += await self._send_command_expect(
+            output += await self.send_command_expect(
                 commit,
                 pattern=r"Do you wish to proceed with this commit anyway\?"
             )
             if "Failed to commit" in output:
                 show_config_failed = type(self)._show_config_failed
-                reason = await self._send_command_expect(show_config_failed)
+                reason = await self.send_command_expect(show_config_failed)
                 raise AionetCommitError(self.host, reason)
             if "One or more commits have occurred" in output:
                 show_commit_changes = type(self)._show_commit_changes
-                await self._send_command_expect('no')
-                reason = await self._send_command_expect(show_commit_changes)
+                await self.send_command_expect('no')
+                reason = await self.send_command_expect(show_commit_changes)
                 raise AionetCommitError(self.host, reason)
 
         if exit_config_mode:
@@ -86,5 +86,5 @@ class CiscoIOSXR(BaseIOSDevice):
     async def _cleanup(self):
         """ Any needed cleanup before closing connection """
         abort = type(self)._abort_command
-        await self._send_command_expect(abort)
+        await self.send_command_expect(abort)
         self._logger.info("Cleanup session")

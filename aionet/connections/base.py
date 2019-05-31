@@ -53,7 +53,7 @@ class BaseConnection(IConnection):
         """ read from buffer """
         raise NotImplementedError("Connection must implement read method ")
 
-    async def read_until_pattern(self, pattern, re_flags=0):
+    async def read_until_pattern(self, pattern, re_flags=0, read_for=0):
         """Read channel until pattern detected. Return ALL data available"""
 
         if pattern is None:
@@ -69,8 +69,10 @@ class BaseConnection(IConnection):
 
             fut = self.read()
             try:
-                output += await asyncio.wait_for(fut, self._timeout)
+                output += await asyncio.wait_for(fut, read_for or self._timeout)
             except asyncio.TimeoutError:
+                if read_for:
+                    return output
                 raise TimeoutError(self._host)
 
             for exp in pattern:
@@ -82,11 +84,11 @@ class BaseConnection(IConnection):
                     )
                     return output
 
-    async def read_until_prompt(self):
+    async def read_until_prompt(self, read_for=0):
         """ read util prompt """
-        return await self.read_until_pattern(self._base_pattern)
+        return await self.read_until_pattern(self._base_pattern, read_for=read_for)
 
-    async def read_until_prompt_or_pattern(self, pattern, re_flags=0):
+    async def read_until_prompt_or_pattern(self, pattern, re_flags=0, read_for=0):
         """ read util prompt or pattern """
 
         logger.info("Host {}: Reading until prompt or pattern".format(self._host))
@@ -97,4 +99,4 @@ class BaseConnection(IConnection):
             pattern = [self._base_prompt] + pattern
         else:
             raise ValueError("pattern must be string or list of strings")
-        return await self.read_until_pattern(pattern=pattern, re_flags=re_flags)
+        return await self.read_until_pattern(pattern=pattern, re_flags=re_flags, read_for=read_for)

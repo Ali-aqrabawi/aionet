@@ -40,7 +40,7 @@ class CiscoASA(BaseIOSDevice):
     async def _check_multiple_mode(self):
         """Check mode multiple. If mode is multiple we adding info about contexts"""
         self._logger.info("Checking multiple mode")
-        out = await self._send_command_expect("show mode")
+        out = await self.send_command_expect("show mode")
         if "multiple" in out:
             self._multiple_mode = True
 

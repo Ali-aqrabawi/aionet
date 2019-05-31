@@ -32,7 +32,7 @@ class BaseTerminalMode:
 
     def __eq__(self, other):
         """ Compare different terminal objects """
-        if isinstance(self, other):
+        if isinstance(other, type(self)):
             if self.name == other.name:
                 return True
         return False

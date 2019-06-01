@@ -2,7 +2,6 @@
 Terminal Modes Classes, which handle entering and exist to
 different terminal modes
 """
-from aionet.logging import logger
 
 
 class BaseTerminalMode:

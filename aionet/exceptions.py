@@ -1,25 +1,25 @@
-class AionetAuthenticationError(Exception):
+class BaseAionetError(Exception):
+    _error_name = ''
 
     def __init__(self, ip_address, code, reason):
         self.ip_address = ip_address
         self.code = code
         self.reason = reason
-        self.msg = "Host %s Disconnect Error: %s" % (ip_address, reason)
+        self.msg = "Host %s %s Error: %s" % (ip_address, type(self)._error_name, reason)
         super().__init__(self.msg)
 
 
-class AionetTimeoutError(Exception):
-
-    def __init__(self, ip_address):
-        self.ip_address = ip_address
-        self.msg = "Host %s Timeout Error" % (ip_address)
-        super().__init__(self.msg)
+class AionetAuthenticationError(BaseAionetError):
+    _error_name = 'Authentication'
 
 
-class AionetCommitError(Exception):
+class AionetTimeoutError(BaseAionetError):
+    _error_name = 'timeout'
 
-    def __init__(self, ip_address, reason):
-        self.ip_address = ip_address
-        self.reason = reason
-        self.msg = "Host %s Commit Error: %s" % (ip_address, reason)
-        super().__init__(self.msg)
+
+class AionetCommitError(BaseAionetError):
+    _error_name = 'commit'
+
+
+class AionetConnectionError(BaseAionetError):
+    _error_name = 'connection'

@@ -8,6 +8,7 @@ import re
 # from aionet.logger import logger
 from aionet.logging import logger, aionetLoggerAdapter
 from aionet.version import __version__
+from aionet.exceptions import AionetConnectionError
 from aionet import utils
 from aionet.connections import SSHConnection, TelnetConnection
 
@@ -209,7 +210,10 @@ class BaseDevice(object):
         * _disable_paging() for non interactive output in commands
         """
         self._logger.info("Trying to connect to the device")
-        await self._establish_connection()
+        try:
+            await self._establish_connection()
+        except OSError as e:
+            raise AionetConnectionError(self.host, None, str(e))
         await self._session_preparation()
         logger.info("Has connected to the device")
 

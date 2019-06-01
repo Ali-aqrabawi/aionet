@@ -8,6 +8,7 @@ import re
 # from aionet.logger import logger
 from aionet.logging import logger, aionetLoggerAdapter
 from aionet.version import __version__
+from aionet.exceptions import AionetConnectionError
 from aionet import utils
 from aionet.connections import SSHConnection, TelnetConnection
 
@@ -185,9 +186,6 @@ class BaseDevice(object):
     _pattern = r"{prompt}.*?(\(.*?\))?[{delimiters}]"
     """Pattern for using in reading buffer. When it found processing ends"""
 
-    _disable_paging_command = "terminal length 0"
-    """Command for disabling paging"""
-
     async def __aenter__(self):
         """Async Context Manager"""
         await self.connect()
@@ -209,7 +207,10 @@ class BaseDevice(object):
         * _disable_paging() for non interactive output in commands
         """
         self._logger.info("Trying to connect to the device")
-        await self._establish_connection()
+        try:
+            await self._establish_connection()
+        except OSError as e:
+            raise AionetConnectionError(self.host, None, str(e))
         await self._session_preparation()
         logger.info("Has connected to the device")
 
@@ -241,12 +242,6 @@ class BaseDevice(object):
         delimiters = r"|".join(delimiters)
         # await self.send_new_line(pattern=delimiters)
         await self._conn.read_until_pattern(delimiters)
-
-    async def _disable_paging(self):
-        """ disable terminal pagination """
-        self._logger.info(
-            "Disabling Pagination, command = %r" % type(self)._disable_paging_command)
-        await self.send_command_expect(type(self)._disable_paging_command)
 
     async def _set_base_prompt(self):
         """
@@ -410,7 +405,10 @@ class BaseDevice(object):
         """ Sending new line """
         return await self.send_command_expect('\n', pattern=pattern, dont_read=dont_read)
 
-    async def send_command_expect(self, command, pattern='', re_flags=0, dont_read=False, read_for=0):
+    async def send_command_expect(self, command,
+                                  pattern='',
+                                  re_flags=0, dont_read=False,
+                                  read_for=0):
         """ Send a single line of command and readuntil prompte"""
         self._conn.send(self._normalize_cmd(command))
         if dont_read:
@@ -439,6 +437,7 @@ class BaseDevice(object):
 
         # Send config commands
         self._logger.debug("Config commands: %s" % config_commands)
+        config_commands = ['\n'] + config_commands  # to get ride of unwanted messages.
         output = ""
         for cmd in config_commands:
             output += await self.send_command_expect(cmd)

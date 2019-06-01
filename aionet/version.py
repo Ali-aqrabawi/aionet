@@ -2,7 +2,7 @@
 aionet Version information
 """
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 __author__ = "ali aqrabawi"
 __author_email__ = "aaqrabaw@gmail.com"
 __url__ = "http://aionet.readthedocs.io/"

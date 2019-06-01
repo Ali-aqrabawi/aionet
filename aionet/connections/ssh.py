@@ -81,7 +81,7 @@ class SSHConnection(BaseConnection):
         except asyncssh.DisconnectError as e:
             raise AionetAuthenticationError(self._host, e.code, e.reason)
         except asyncio.TimeoutError:
-            raise AionetTimeoutError('timeout while connecting to %r' % self._host)
+            raise AionetTimeoutError(self._host, None, 'timeout while connecting to %r' % self._host)
 
         await self._start_session()
 

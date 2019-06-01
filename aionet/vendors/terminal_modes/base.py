@@ -57,21 +57,21 @@ class BaseTerminalMode:
         self._logger.info("Entering to %s" % self.name)
         if await self.check():
             return ""
-        output = await self.device.send_command(self._enter_command, pattern="Password")
-        if not await self.check():
+        output = await self.device.send_command_expect(self._enter_command, pattern="Password")
+        if not await self.check(force=True):
             raise ValueError("Failed to enter to %s" % self.name)
         self.device.current_terminal = self
         return output
 
     async def exit(self):
         """ exit terminal mode """
-        self._logger.info("Host {}: Exiting from %s" % self.name)
+        self._logger.info("Exiting from %s" % self.name)
         if not await self.check():
             return ""
         if self.device.current_terminal != self:
             return ""
 
-        output = await self.device.send_command(self._exit_command)
+        output = await self.device.send_command_expect(self._exit_command)
         if await self.check(force=True):
             raise ValueError("Failed to Exit from %s" % self.name)
         self.device.current_terminal = self._parent

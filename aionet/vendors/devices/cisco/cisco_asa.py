@@ -37,6 +37,10 @@ class CiscoASA(BaseIOSDevice):
         await super()._session_preparation()
         await self._check_multiple_mode()
 
+    async def _disable_width(self):
+        self._logger.info("setting terminal width to 511")
+        await self.send_config_set([type(self)._disable_width_command])
+
     async def _check_multiple_mode(self):
         """Check mode multiple. If mode is multiple we adding info about contexts"""
         self._logger.info("Checking multiple mode")

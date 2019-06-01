@@ -73,10 +73,29 @@ class BaseIOSDevice(BaseDevice):
     _config_check = ")#"
     """Checking string in prompt. If it's exist im prompt - we are in configuration mode"""
 
+    _disable_paging_command = "terminal length 0"
+    """Command for disabling paging"""
+
+    _disable_width_command = "terminal width 511"
+    """Command for disabling paging"""
+
     async def _session_preparation(self):
         await super()._session_preparation()
         await self.enable_mode()
         await self._disable_paging()
+        await self._disable_width()
+
+    async def _disable_paging(self):
+        """ disable terminal pagination """
+        self._logger.info(
+            "Disabling Pagination, command = %r" % type(self)._disable_paging_command)
+        await self.send_command_expect(type(self)._disable_paging_command)
+
+    async def _disable_width(self):
+        """ disable width pagination """
+        self._logger.info(
+            "Disabling width, command = %r" % type(self)._disable_width_command)
+        await self.send_command_expect(type(self)._disable_width_command)
 
     async def send_config_set(self, config_commands=None, exit_config_mode=True):
         """
@@ -92,13 +111,14 @@ class BaseIOSDevice(BaseDevice):
             return ""
 
         # Send config commands
-        output = await self.config_mode()
+        await self.config_mode()
+        output = ''
         output += await super().send_config_set(config_commands=config_commands)
 
         if exit_config_mode:
             output += await self.config_mode.exit()
 
-        self._logger.debug("Config commands output: %s"%repr(output))
+        self._logger.debug("Config commands output: %s" % repr(output))
 
         return output
 

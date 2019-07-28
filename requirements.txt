@@ -1,2 +1,2 @@
-textfsm=0.4.1
+textfsm==0.4.1
 asyncssh

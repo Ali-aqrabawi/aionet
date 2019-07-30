@@ -59,12 +59,12 @@ Example of interacting with Cisco IOS devices:
         dev1 = { 'username' : 'user',
                  'password' : 'pass',
                  'device_type': 'cisco_ios',
-                 'host': 'ip address',
+                 'ip': 'ip address',
         }
         dev2 = { 'username' : 'user',
                  'password' : 'pass',
                  'device_type': 'cisco_ios',
-                 'host': 'ip address',
+                 'ip': 'ip address',
         }
         devices = [dev1, dev2]
         tasks = [task(dev) for dev in devices]

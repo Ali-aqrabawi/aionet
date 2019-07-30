@@ -72,15 +72,17 @@ class BAseJunOSDevice(BaseDevice):
         # Strip off trailing terminator
         if "@" in prompt:
             prompt = prompt.split("@")[1]
-        self._base_prompt = prompt
+        self.device_prompt = prompt
         delimiters = map(re.escape, type(self)._delimiter_list)
         delimiters = r"|".join(delimiters)
-        base_prompt = re.escape(self._base_prompt[:12])
+        base_prompt = re.escape(self.device_prompt[:12])
         pattern = type(self)._pattern
-        self._base_pattern = pattern.format(delimiters=delimiters)
-        self._logger.debug("Base Prompt: %s" % self._base_prompt)
-        self._logger.debug("Base Pattern: %s" % self._base_pattern)
-        return self._base_prompt
+        base_pattern = pattern.format(delimiters=delimiters)
+        self._logger.debug("Base Prompt: %s" % self.device_prompt)
+        self._logger.debug("Base Pattern: %s" % base_pattern)
+        self.prompt_pattern = base_pattern
+        self._conn.set_base_pattern(base_pattern)
+        return self.device_prompt
 
     async def send_config_set(
             self,

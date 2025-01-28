@@ -1,13 +1,13 @@
 [<img src="https://api.gitsponsors.com/api/badge/img?id=189100742" height="20">](https://api.gitsponsors.com/api/badge/link?p=s/bIl/DSZ7HepRgke8KW2Vt4Pi/Q3xXs9E6KBJtgn2X1UlNsUFTLHp1GigANZtx9MQX6ghXb+Yf72QNh8p3oV+C9ModLWLBuGfyDclwaWgmne5pYAA++TVeZV6mvougXpMIvDycu+iktpXiZ0dRwZQ==)
 
-aionet
+# aionet
 ******
 
 Asynchronous multi-vendor library for interacting with network devices
 
 this is a fork from netdev, with code refactor and new features added.
 
-Requires:
+## Requires:
 ---------
 * asyncio
 * AsyncSSH
@@ -15,7 +15,7 @@ Requires:
 * pyYAML
 * asyncssh
  
-Supports: 
+## Supports: 
 ---------
 * Cisco IOS 
 * Cisco IOS XE
@@ -31,17 +31,17 @@ Supports:
 * Aruba AOS 8.X
 * Terminal
 
-Features:
+## Features:
 ---------
 * SSH
 * Telnet
 * TextFSM
 
-Examples:
+## Examples:
 ---------
 Example of interacting with Cisco IOS devices:
 
-.. code-block:: python
+```python
 
     import asyncio
     import aionet
@@ -76,4 +76,4 @@ Example of interacting with Cisco IOS devices:
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run())
 
-
+```
